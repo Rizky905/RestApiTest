@@ -28,10 +28,11 @@ class ProductController extends BaseController{
 
      public function store(Request $request){
          $input = $request->all();
+
          $validator = Validator::make($input,[
             'name' => 'required',
             'detail' => 'required',
-            'price' => 'reuired'
+            'price' => 'required'
          ]);
          
          if($validator->fails()){
