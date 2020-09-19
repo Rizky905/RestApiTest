@@ -12,10 +12,33 @@ use Validator;
 
 class RegisterController extends BaseController{
     /**
-     * Register api
+     * Register apiz
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function login(Request $request){
+        $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string'
+        ]);
+        $credentials = request(['email','password']);
+
+        if(!Auth::attempt($credentials)){
+            return response()->json([
+                'message' => 'invalid email or password'
+            ], 401);
+        }
+
+        $user = $request->user();
+        $token = $user ->createToken('access token');
+        $user->access_token = $token->accessToken;
+        
+        return response()->json([
+            "user"=>$user
+        ], 200);
+    }
+
 
      public function register(Request $request){
          $validator = Validator::make($request->all(), [
@@ -29,12 +52,6 @@ class RegisterController extends BaseController{
              return $this->sendError('validation error', $validator->errors());
          }
 
-        //  $input = $request->all();
-        // $input['password'] = bcrypt($input['password']);
-        // $user = User::create($input);
-        // $success['token'] =  $user->createToken('MyApp')->accessToken;
-        // $success['name'] =  $user->name;
-
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
@@ -44,4 +61,6 @@ class RegisterController extends BaseController{
          return $this->sendResponse($success, 'User register successfully.');
 
      }
+
+   
 }
